@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
-	"gophercloud/openstack/blockstorage/v3/volumes"
-	"gophercloud/openstack/identity/v3/projects"
+	"github.com/gophercloud/gophercloud/openstack/blockstorage/v3/volumes"
+	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"sort"
 	"strconv"
 

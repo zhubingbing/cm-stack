@@ -2,8 +2,13 @@ package router
 
 import (
 	"cm-stack/src/service/openstack"
+	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/api"
 	"net/http"
+
+	"github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
 
@@ -66,6 +71,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		//OpenStack_Compute.GET("/:id", .Get)
 	}
 
+	Promethues_Api := g.Group("/promethues")
+	{
+		Promethues_Api.GET("/targets", DoTargets)
+		Promethues_Api.GET("/alerts", DoAlerts)
+		Promethues_Api.GET("/alert", GetAlerts)
+
+	}
 
 
 	a := g.Group("/api")
@@ -252,4 +264,65 @@ func GetUser(c*gin.Context)  {
 
 	})
 
+}
+
+func DoTargets(c *gin.Context)  {
+	//client := &prometheus.ApiTest{}
+
+	cfg := api.Config{}
+
+	cfg.Address = "http://172.21.21.200:9091"
+    cfg.RoundTripper = api.DefaultRoundTripper
+
+	client ,_ := api.NewClient(cfg)
+
+
+	apiClient := v1.NewAPI(client)
+
+	a , _:= apiClient.Targets(context.Background())
+
+	fmt.Println(a.Active)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": a,
+		"code": 20000,
+
+	})
+}
+
+func DoAlerts(c *gin.Context)  {
+	//client := &prometheus.ApiTest{}
+
+	cfg := api.Config{}
+
+	cfg.Address = "http://172.21.21.200:9091"
+	cfg.RoundTripper = api.DefaultRoundTripper
+
+	client ,_ := api.NewClient(cfg)
+
+	apiClient := v1.NewAPI(client)
+
+	a , _:= apiClient.Alerts(context.Background())
+
+	fmt.Println(a.Alerts)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": a.Alerts,
+		"code": 20000,
+
+	})
+}
+
+func GetAlerts(c *gin.Context)  {
+	//client := &prometheus.ApiTest{}
+
+	fmt.Println(c.Request.Method)
+
+	fmt.Println(c)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": "test",
+		"code": 20000,
+
+	})
 }
