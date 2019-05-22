@@ -2,6 +2,7 @@ package router
 
 import (
 	"cm-stack/src/service/openstack"
+	"cm-stack/src/service/prometheus"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -75,7 +76,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		Promethues_Api.GET("/targets", DoTargets)
 		Promethues_Api.GET("/alerts", DoAlerts)
-		Promethues_Api.GET("/alert", GetAlerts)
+		Promethues_Api.POST("/alert", AlertsWeebHook)
 
 	}
 
@@ -313,12 +314,21 @@ func DoAlerts(c *gin.Context)  {
 	})
 }
 
-func GetAlerts(c *gin.Context)  {
+func AlertsWeebHook(c *gin.Context)  {
 	//client := &prometheus.ApiTest{}
 
-	fmt.Println(c.Request.Method)
+	var notification prometheus.Notification
 
-	fmt.Println(c)
+	err := c.BindJSON(&notification)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": " successful receive alert notification message!"}
+
+
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": "test",
